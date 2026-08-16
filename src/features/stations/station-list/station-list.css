@@ -1,0 +1,30 @@
+.station-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.station-list--message {
+  padding: var(--space-4);
+}
+
+.station-list__skeletons {
+  display: flex;
+  flex-direction: column;
+}
+
+.station-list__skeleton-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.station-list__notice {
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  border-bottom: 1px solid var(--color-border);
+}

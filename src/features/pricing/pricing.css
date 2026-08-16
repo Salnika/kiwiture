@@ -1,0 +1,196 @@
+.price-headline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: baseline;
+}
+
+.price-headline__value {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--color-price-known);
+  letter-spacing: -0.01em;
+}
+
+.price-headline--unknown .price-headline__value {
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  color: var(--color-price-unknown);
+}
+
+.price-headline--free .price-headline__value {
+  color: var(--color-free);
+}
+
+.price-headline__extra {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.price-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px var(--space-2);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.price-badge--exact {
+  color: var(--color-accent-text);
+  background: var(--color-accent-soft);
+  border-color: color-mix(in srgb, var(--color-accent) 40%, transparent);
+}
+
+.price-badge--parsed {
+  color: var(--color-info-text);
+  background: var(--color-info-soft);
+  border-color: color-mix(in srgb, var(--color-info-text) 30%, transparent);
+}
+
+.price-badge--estimated {
+  color: var(--color-warning);
+  background: var(--color-warning-soft);
+  border-color: color-mix(in srgb, var(--color-warning) 35%, transparent);
+}
+
+.price-badge--unknown {
+  color: var(--color-text-muted);
+  background: var(--color-bg-subtle);
+}
+
+.raw-tariff {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.raw-tariff__title {
+  font-size: var(--font-size-md);
+  font-weight: 600;
+}
+
+.raw-tariff__quote {
+  padding: var(--space-3);
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: var(--font-size-sm);
+  white-space: pre-wrap;
+  background: var(--color-bg-subtle);
+  border-left: 3px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+}
+
+.raw-tariff__empty,
+.raw-tariff__meta {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.raw-tariff__meta--muted {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-faint);
+}
+
+.cost-estimate {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: var(--color-bg-subtle);
+  border-radius: var(--radius-md);
+}
+
+.cost-estimate__amount {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+}
+
+.cost-estimate__note {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.energy-input {
+  display: inline-flex;
+  flex: none;
+  flex-direction: column;
+  gap: 2px;
+  justify-content: center;
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-pill);
+}
+
+.energy-input__label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.energy-input__control {
+  display: flex;
+  gap: var(--space-1);
+  align-items: baseline;
+}
+
+.energy-input__field {
+  width: 3.5rem;
+  padding: 0;
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  background: transparent;
+  border: none;
+}
+
+.energy-input__unit {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.energy-input__hint {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-faint);
+  white-space: nowrap;
+}
+
+.soc-picker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.soc-picker input[type='range'] {
+  width: 100%;
+  height: var(--tap-target);
+  accent-color: var(--color-accent);
+}
+
+.tradeoff {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: var(--color-accent-soft);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 40%, transparent);
+  border-radius: var(--radius-md);
+}
+
+.tradeoff__title {
+  font-size: var(--font-size-md);
+  font-weight: 700;
+  color: var(--color-accent-text);
+}
+
+.tradeoff__metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-4);
+  font-size: var(--font-size-sm);
+}
+
+.tradeoff__note {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}

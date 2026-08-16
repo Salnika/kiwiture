@@ -1,0 +1,178 @@
+/**
+ * Design tokens (spec 42).
+ * Light palette on bare :root, dark redefinitions under both the media query and
+ * the explicit [data-theme="dark"] attribute so the in-app theme switch wins in
+ * both directions.
+ */
+
+:root {
+  /* Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-pill: 999px;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  /* Typography */
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.8125rem;
+  --font-size-base: 0.9375rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.375rem;
+  --font-size-2xl: 1.75rem;
+
+  /* Minimum tactile target (spec 36) */
+  --tap-target: 44px;
+
+  /* Elevation */
+  --shadow-sm: 0 1px 2px rgb(15 23 42 / 8%);
+  --shadow-md: 0 4px 16px rgb(15 23 42 / 10%);
+  --shadow-lg: 0 12px 32px rgb(15 23 42 / 16%);
+
+  /* Colors — light */
+  --color-bg: #ffffff;
+  --color-bg-subtle: #f5f6f8;
+  --color-surface: #ffffff;
+  --color-surface-raised: #ffffff;
+  --color-border: #dfe3e8;
+  --color-border-strong: #b6bdc7;
+
+  --color-text: #14181f;
+  --color-text-muted: #59616e;
+  --color-text-faint: #7c848f;
+  --color-text-inverse: #ffffff;
+
+  --color-accent: #0b6d4d;
+  --color-accent-hover: #085840;
+  --color-accent-soft: #e3f2ec;
+  --color-accent-text: #07543c;
+
+  --color-focus: #1a63d8;
+
+  --color-price-known: #0b6d4d;
+  --color-price-unknown: #6b7280;
+  --color-free: #7a4a06;
+  --color-free-soft: #fdf1dc;
+
+  --color-warning: #8a5a00;
+  --color-warning-soft: #fdf3df;
+  --color-danger: #a3261f;
+  --color-danger-soft: #fdeceb;
+  --color-info-soft: #e8effb;
+  --color-info-text: #1a4b9c;
+
+  --map-pin-bg: #ffffff;
+  --map-pin-text: #14181f;
+  --map-pin-border: #14181f;
+  --map-pin-selected-bg: #0b6d4d;
+  --map-pin-selected-text: #ffffff;
+
+  color-scheme: light;
+}
+
+:root[data-theme='dark'],
+:root:not([data-theme='light']) {
+  /* placeholder kept empty on purpose: dark values live in the two blocks below */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --color-bg: #0f141b;
+    --color-bg-subtle: #151b24;
+    --color-surface: #171e28;
+    --color-surface-raised: #1e2733;
+    --color-border: #2b3543;
+    --color-border-strong: #3d4a5c;
+
+    --color-text: #f1f4f8;
+    --color-text-muted: #a9b3c1;
+    --color-text-faint: #8b95a4;
+    --color-text-inverse: #0f141b;
+
+    --color-accent: #3ecf9a;
+    --color-accent-hover: #56dfae;
+    --color-accent-soft: #17332a;
+    --color-accent-text: #7ee7bd;
+
+    --color-focus: #7fb0ff;
+
+    --color-price-known: #3ecf9a;
+    --color-price-unknown: #9aa4b2;
+    --color-free: #f0c274;
+    --color-free-soft: #33280f;
+
+    --color-warning: #f0c274;
+    --color-warning-soft: #332811;
+    --color-danger: #ff9d95;
+    --color-danger-soft: #3a1c1a;
+    --color-info-soft: #16243c;
+    --color-info-text: #a8c6ff;
+
+    --shadow-sm: 0 1px 2px rgb(0 0 0 / 40%);
+    --shadow-md: 0 4px 16px rgb(0 0 0 / 45%);
+    --shadow-lg: 0 12px 32px rgb(0 0 0 / 55%);
+
+    --map-pin-bg: #1e2733;
+    --map-pin-text: #f1f4f8;
+    --map-pin-border: #f1f4f8;
+    --map-pin-selected-bg: #3ecf9a;
+    --map-pin-selected-text: #0f141b;
+
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme='dark'] {
+  --color-bg: #0f141b;
+  --color-bg-subtle: #151b24;
+  --color-surface: #171e28;
+  --color-surface-raised: #1e2733;
+  --color-border: #2b3543;
+  --color-border-strong: #3d4a5c;
+
+  --color-text: #f1f4f8;
+  --color-text-muted: #a9b3c1;
+  --color-text-faint: #8b95a4;
+  --color-text-inverse: #0f141b;
+
+  --color-accent: #3ecf9a;
+  --color-accent-hover: #56dfae;
+  --color-accent-soft: #17332a;
+  --color-accent-text: #7ee7bd;
+
+  --color-focus: #7fb0ff;
+
+  --color-price-known: #3ecf9a;
+  --color-price-unknown: #9aa4b2;
+  --color-free: #f0c274;
+  --color-free-soft: #33280f;
+
+  --color-warning: #f0c274;
+  --color-warning-soft: #332811;
+  --color-danger: #ff9d95;
+  --color-danger-soft: #3a1c1a;
+  --color-info-soft: #16243c;
+  --color-info-text: #a8c6ff;
+
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 40%);
+  --shadow-md: 0 4px 16px rgb(0 0 0 / 45%);
+  --shadow-lg: 0 12px 32px rgb(0 0 0 / 55%);
+
+  --map-pin-bg: #1e2733;
+  --map-pin-text: #f1f4f8;
+  --map-pin-border: #f1f4f8;
+  --map-pin-selected-bg: #3ecf9a;
+  --map-pin-selected-text: #0f141b;
+
+  color-scheme: dark;
+}

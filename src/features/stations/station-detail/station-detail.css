@@ -1,0 +1,81 @@
+.station-detail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.station-detail__name {
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.station-detail__operator {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.station-detail__address {
+  margin-top: var(--space-1);
+  color: var(--color-text-muted);
+}
+
+.station-detail h2 {
+  margin-bottom: var(--space-2);
+  font-size: var(--font-size-lg);
+}
+
+.station-detail__facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--space-3);
+  margin: var(--space-3) 0 0;
+}
+
+.station-detail__facts dt {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.station-detail__facts dd {
+  margin: 2px 0 0;
+  font-weight: 600;
+}
+
+.station-detail__connectors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: 0;
+  margin: 0 0 var(--space-3);
+  list-style: none;
+}
+
+.station-detail__table {
+  width: 100%;
+  font-size: var(--font-size-sm);
+  border-collapse: collapse;
+}
+
+.station-detail__table th,
+.station-detail__table td {
+  padding: var(--space-2);
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.station-detail__table th {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.station-detail__note {
+  margin-top: var(--space-2);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-faint);
+}

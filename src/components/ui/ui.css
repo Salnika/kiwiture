@@ -1,0 +1,205 @@
+/* Shared UI primitives. Sober, utilitarian, mobile-first (spec 41). */
+
+.chip {
+  display: inline-flex;
+  gap: var(--space-2);
+  align-items: center;
+  justify-content: center;
+  min-height: var(--tap-target);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--color-text);
+  white-space: nowrap;
+  cursor: pointer;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-pill);
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+.chip:hover {
+  background: var(--color-bg-subtle);
+}
+
+.chip[aria-pressed='true'],
+.chip[data-active='true'] {
+  color: var(--color-accent-text);
+  background: var(--color-accent-soft);
+  border-color: var(--color-accent);
+  /* Never colour alone: the checkmark carries the state too (spec 36). */
+}
+
+.chip__check {
+  font-size: var(--font-size-xs);
+}
+
+.button {
+  display: inline-flex;
+  gap: var(--space-2);
+  align-items: center;
+  justify-content: center;
+  min-height: var(--tap-target);
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--color-text);
+  text-decoration: none;
+  cursor: pointer;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+}
+
+.button:hover:not(:disabled) {
+  background: var(--color-bg-subtle);
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.button--primary {
+  color: var(--color-text-inverse);
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.button--primary:hover:not(:disabled) {
+  background: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
+}
+
+.button--ghost {
+  background: transparent;
+  border-color: transparent;
+}
+
+.button--ghost:hover:not(:disabled) {
+  background: var(--color-bg-subtle);
+}
+
+.button--block {
+  width: 100%;
+}
+
+.banner {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--font-size-sm);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+}
+
+.banner__icon {
+  flex: none;
+  font-size: var(--font-size-md);
+  line-height: 1.2;
+}
+
+.banner__body {
+  min-width: 0;
+}
+
+.banner__title {
+  font-weight: 600;
+}
+
+.banner--info {
+  color: var(--color-info-text);
+  background: var(--color-info-soft);
+  border-color: color-mix(in srgb, var(--color-info-text) 25%, transparent);
+}
+
+.banner--warning {
+  color: var(--color-warning);
+  background: var(--color-warning-soft);
+  border-color: color-mix(in srgb, var(--color-warning) 35%, transparent);
+}
+
+.banner--error {
+  color: var(--color-danger);
+  background: var(--color-danger-soft);
+  border-color: color-mix(in srgb, var(--color-danger) 35%, transparent);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.field__label {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.field__hint {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-faint);
+}
+
+.input {
+  width: 100%;
+  min-height: var(--tap-target);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+}
+
+.input:disabled {
+  background: var(--color-bg-subtle);
+}
+
+.tag {
+  display: inline-flex;
+  gap: var(--space-1);
+  align-items: center;
+  padding: 2px var(--space-2);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.tag--muted {
+  color: var(--color-text-muted);
+  background: var(--color-bg-subtle);
+}
+
+.tag--free {
+  color: var(--color-free);
+  background: var(--color-free-soft);
+  border-color: color-mix(in srgb, var(--color-free) 35%, transparent);
+}
+
+.segmented {
+  display: inline-flex;
+  padding: 2px;
+  background: var(--color-bg-subtle);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+}
+
+.segmented__option {
+  min-height: 36px;
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-pill);
+}
+
+.segmented__option[aria-pressed='true'] {
+  color: var(--color-text);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}

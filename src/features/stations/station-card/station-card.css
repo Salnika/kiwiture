@@ -1,0 +1,114 @@
+.station-card {
+  position: relative;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.station-card[data-selected='true'] {
+  background: var(--color-accent-soft);
+  box-shadow: inset 3px 0 0 var(--color-accent);
+}
+
+/* Full-card hit area for selection, kept behind the interactive children. */
+.station-card__hit {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+}
+
+.station-card__hit:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: -4px;
+}
+
+.station-card__body {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  pointer-events: none;
+}
+
+.station-card__body button,
+.station-card__body a {
+  pointer-events: auto;
+}
+
+.station-card__name {
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.station-card__operator {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-faint);
+}
+
+.station-card__cost {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.station-card__distance {
+  font-size: var(--font-size-sm);
+}
+
+.station-card__distance--approx {
+  color: var(--color-text-muted);
+}
+
+.station-card__distance-note {
+  font-weight: 400;
+  color: var(--color-text-muted);
+}
+
+.station-card__specs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.station-card__spec-note {
+  color: var(--color-warning);
+}
+
+.station-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.station-card__footer {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--space-1);
+}
+
+.station-card__detail {
+  min-height: 36px;
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-accent-text);
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-pill);
+}
+
+.station-card__detail:hover {
+  background: var(--color-bg-subtle);
+}

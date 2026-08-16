@@ -1,0 +1,94 @@
+.place-search {
+  position: relative;
+}
+
+.place-search__control {
+  display: flex;
+  gap: var(--space-1);
+  align-items: center;
+  padding-right: var(--space-1);
+  padding-left: var(--space-2);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+}
+
+.place-search__control:focus-within {
+  border-color: var(--color-focus);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-focus) 30%, transparent);
+}
+
+.place-search__input {
+  flex: 1;
+  min-width: 0;
+  min-height: var(--tap-target);
+  padding: 0 var(--space-2);
+  background: transparent;
+  border: none;
+}
+
+.place-search__input:focus {
+  outline: none;
+}
+
+.place-search__clear {
+  width: 32px;
+  height: 32px;
+  font-size: var(--font-size-lg);
+  line-height: 1;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+}
+
+.place-search__clear:hover {
+  background: var(--color-bg-subtle);
+}
+
+.place-search__listbox {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  left: 0;
+  z-index: 20;
+  max-height: 280px;
+  padding: var(--space-1);
+  margin: 0;
+  overflow-y: auto;
+  list-style: none;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+}
+
+.place-search__option {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-height: var(--tap-target);
+  padding: var(--space-2) var(--space-3);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+}
+
+.place-search__option[data-active='true'] {
+  background: var(--color-accent-soft);
+}
+
+.place-search__option-label {
+  font-weight: 500;
+}
+
+.place-search__option-context {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.place-search__status {
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--font-size-xs);
+  color: var(--color-danger);
+}
