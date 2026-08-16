@@ -49,7 +49,8 @@
 
   --color-text: #14181f;
   --color-text-muted: #59616e;
-  --color-text-faint: #7c848f;
+  /* AA at 12px on both --color-bg and --color-bg-subtle (>= 4.5:1). */
+  --color-text-faint: #69707a;
   --color-text-inverse: #ffffff;
 
   --color-accent: #0b6d4d;
