@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { Banner, Button, Skeleton } from '@/components/ui'
 import { irveRepository } from '@/features/charging-data/irve/repository'
 import { StationDetail } from '@/features/stations/station-detail/StationDetail'
@@ -20,12 +20,19 @@ export default function StationPage() {
     enabled: stationId.length > 0,
   })
 
+  // Distances computed on the previous screen, when the user came from the list.
+  const carried = (useLocation().state ?? null) as Partial<StationWithDistance> | null
+
   const station: StationWithDistance | null = query.data
     ? {
         ...query.data,
-        straightLineDistanceKm: origin
-          ? haversineDistanceKm(origin, query.data.location)
-          : Number.NaN,
+        straightLineDistanceKm:
+          carried?.straightLineDistanceKm ??
+          (origin ? haversineDistanceKm(origin, query.data.location) : Number.NaN),
+        routeDistanceKm: carried?.routeDistanceKm,
+        routeDurationMin: carried?.routeDurationMin,
+        detourDistanceKm: carried?.detourDistanceKm,
+        detourDurationMin: carried?.detourDurationMin,
       }
     : null
 

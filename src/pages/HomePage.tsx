@@ -78,12 +78,29 @@ export default function HomePage() {
     return () => window.clearTimeout(timer)
   }, [locationAsked, origin, locate])
 
+  /**
+   * The detail screen reads the station from the local cache, which holds no
+   * routing metrics. Carrying them in the navigation state keeps the distances
+   * consistent with the card the user just tapped, without duplicating server
+   * state in a store (spec 40).
+   */
   const openDetail = useCallback(
     (id: string) => {
       selectStation(id)
-      navigate(`/station/${encodeURIComponent(id)}`)
+      const station = search.stations.find((candidate) => candidate.id === id)
+      navigate(`/station/${encodeURIComponent(id)}`, {
+        state: station
+          ? {
+              straightLineDistanceKm: station.straightLineDistanceKm,
+              routeDistanceKm: station.routeDistanceKm,
+              routeDurationMin: station.routeDurationMin,
+              detourDistanceKm: station.detourDistanceKm,
+              detourDurationMin: station.detourDurationMin,
+            }
+          : undefined,
+      })
     },
-    [navigate, selectStation],
+    [navigate, selectStation, search.stations],
   )
 
   const listProps = {

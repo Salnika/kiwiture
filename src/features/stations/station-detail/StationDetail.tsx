@@ -59,6 +59,14 @@ export function StationDetail({
   const updated = formatDate(station.updatedAt)
   const datasetUpdated = formatDate(station.source.datasetUpdatedAt)
 
+  // IRVE addresses usually already contain the city; appending it would repeat it.
+  const fullAddress = useMemo(() => {
+    const { address, city } = station.location
+    if (!address) return city
+    if (!city) return address
+    return address.toLowerCase().includes(city.toLowerCase()) ? address : `${address}, ${city}`
+  }, [station.location])
+
   return (
     <article className="station-detail">
       {/* --- Résumé --------------------------------------------------------- */}
@@ -70,12 +78,7 @@ export function StationDetail({
         {station.operatorName ? (
           <p className="station-detail__operator">{station.operatorName}</p>
         ) : null}
-        {station.location.address ? (
-          <p className="station-detail__address">
-            {station.location.address}
-            {station.location.city ? `, ${station.location.city}` : ''}
-          </p>
-        ) : null}
+        {fullAddress ? <p className="station-detail__address">{fullAddress}</p> : null}
 
         <dl className="station-detail__facts">
           <div>
