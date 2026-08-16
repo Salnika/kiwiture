@@ -190,13 +190,22 @@ test.describe('Kiwiture — hors ligne', () => {
       { timeout: 30_000 },
     )
 
-    // Go offline and reload: the IndexedDB cache must carry the stations.
+    // Go offline and reload: the service worker must serve the shell and the
+    // IndexedDB cache must carry the stations.
     await context.setOffline(true)
     await page.reload()
 
-    await expect(page.getByTestId('offline-banner')).toBeVisible()
     await expect(page.getByTestId('station-card').first()).toBeVisible()
     await expect(page.getByText('Affichage des dernières données disponibles')).toBeVisible()
+
+    // The banner reacts to the browser's connectivity events. Dispatching them
+    // exercises our own contract; asserting on `navigator.onLine` alone would
+    // depend on how each CI runner emulates offline mode.
+    await page.evaluate(() => window.dispatchEvent(new Event('offline')))
+    await expect(page.getByTestId('offline-banner')).toBeVisible()
+
+    await page.evaluate(() => window.dispatchEvent(new Event('online')))
+    await expect(page.getByTestId('offline-banner')).toBeHidden()
 
     await context.setOffline(false)
   })
