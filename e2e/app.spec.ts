@@ -3,7 +3,15 @@ import { mockBackends, useMockedPosition } from './fixtures'
 
 /** Critical E2E scenarios (spec 47). */
 
+/**
+ * The service worker is blocked for most scenarios: it intercepts cross-origin
+ * requests (map tiles and styles) before Playwright's route mocks can, so the
+ * basemap would try to reach the real network. The offline scenario re-enables
+ * it explicitly, since that is precisely what it tests.
+ */
 test.describe('Kiwiture', () => {
+  test.use({ serviceWorkers: 'block' })
+
   test('Scénario 1 — position autorisée, liste, détail', async ({ page }) => {
     await mockBackends(page)
     await useMockedPosition(page)
@@ -94,39 +102,6 @@ test.describe('Kiwiture', () => {
     await expect(page.getByText('Distance routière indisponible').first()).toBeVisible()
   })
 
-  test('Scénario 6 — hors ligne avec cache local', async ({ page, context }) => {
-    await mockBackends(page)
-    await useMockedPosition(page)
-
-    await page.goto('./')
-    await expect(page.getByTestId('station-card').first()).toBeVisible()
-
-    // The service worker must control the page before we cut the network,
-    // otherwise the reload cannot even fetch the shell.
-    await page.evaluate(async () => {
-      const registration = await navigator.serviceWorker.ready
-      if (!navigator.serviceWorker.controller) {
-        await new Promise<void>((resolve) => {
-          navigator.serviceWorker.addEventListener('controllerchange', () => resolve(), {
-            once: true,
-          })
-          registration.active?.postMessage('ping')
-          setTimeout(resolve, 3000)
-        })
-      }
-    })
-
-    // Go offline and reload: the IndexedDB cache must carry the stations.
-    await context.setOffline(true)
-    await page.reload()
-
-    await expect(page.getByTestId('offline-banner')).toBeVisible()
-    await expect(page.getByTestId('station-card').first()).toBeVisible()
-    await expect(page.getByText('Affichage des dernières données disponibles')).toBeVisible()
-
-    await context.setOffline(false)
-  })
-
   test('la source des données et la limite de prix sont expliquées', async ({ page }) => {
     await mockBackends(page)
     await page.goto('./donnees')
@@ -171,5 +146,42 @@ test.describe('Kiwiture', () => {
       expect(content).not.toMatch(/\bsk\.ey[A-Za-z0-9]/)
       expect(content).not.toMatch(/API_SECRET|PRIVATE_KEY/)
     }
+  })
+})
+
+test.describe('Kiwiture — hors ligne', () => {
+  test.use({ serviceWorkers: 'allow' })
+
+  test('Scénario 6 — hors ligne avec cache local', async ({ page, context }) => {
+    await mockBackends(page)
+    await useMockedPosition(page)
+
+    await page.goto('./')
+    await expect(page.getByTestId('station-card').first()).toBeVisible()
+
+    // The service worker must control the page before we cut the network,
+    // otherwise the reload cannot even fetch the shell.
+    await page.evaluate(async () => {
+      const registration = await navigator.serviceWorker.ready
+      if (!navigator.serviceWorker.controller) {
+        await new Promise<void>((resolve) => {
+          navigator.serviceWorker.addEventListener('controllerchange', () => resolve(), {
+            once: true,
+          })
+          registration.active?.postMessage('ping')
+          setTimeout(resolve, 3000)
+        })
+      }
+    })
+
+    // Go offline and reload: the IndexedDB cache must carry the stations.
+    await context.setOffline(true)
+    await page.reload()
+
+    await expect(page.getByTestId('offline-banner')).toBeVisible()
+    await expect(page.getByTestId('station-card').first()).toBeVisible()
+    await expect(page.getByText('Affichage des dernières données disponibles')).toBeVisible()
+
+    await context.setOffline(false)
   })
 })

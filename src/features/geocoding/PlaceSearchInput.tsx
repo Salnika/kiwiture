@@ -41,7 +41,12 @@ export function PlaceSearchInput({
   const [open, setOpen] = useState(false)
   const [activeIndex, setActiveIndex] = useState(-1)
   const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle')
-  const justSelected = useRef(false)
+  /**
+   * Only a keystroke may trigger a lookup. Programmatic updates — picking a
+   * suggestion, or filling the field with the reverse-geocoded position — must
+   * not reopen the suggestion list.
+   */
+  const userIsTyping = useRef(false)
 
   const proximityKey = useMemo(
     () => (proximity ? `${proximity.latitude.toFixed(2)},${proximity.longitude.toFixed(2)}` : ''),
@@ -49,10 +54,8 @@ export function PlaceSearchInput({
   )
 
   useEffect(() => {
-    if (justSelected.current) {
-      justSelected.current = false
-      return
-    }
+    if (!userIsTyping.current) return
+
     const query = value.trim()
     if (query.length < 3) {
       setSuggestions([])
@@ -90,7 +93,7 @@ export function PlaceSearchInput({
   }, [value, proximityKey])
 
   const choose = (result: GeocodingResult) => {
-    justSelected.current = true
+    userIsTyping.current = false
     onValueChange(result.context ? `${result.label}, ${result.context}` : result.label)
     onSelect({
       label: result.label,
@@ -144,6 +147,7 @@ export function PlaceSearchInput({
           placeholder={placeholder ?? label}
           value={value}
           onChange={(event) => {
+            userIsTyping.current = true
             onValueChange(event.target.value)
             if (event.target.value.trim().length === 0) onClear?.()
           }}
@@ -157,6 +161,7 @@ export function PlaceSearchInput({
             className="place-search__clear"
             aria-label={`Effacer ${label.toLowerCase()}`}
             onClick={() => {
+              userIsTyping.current = false
               onValueChange('')
               onClear?.()
               setSuggestions([])

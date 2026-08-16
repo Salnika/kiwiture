@@ -21,6 +21,13 @@ const CLUSTER_LAYER = 'stations-clusters'
 const CLUSTER_COUNT_LAYER = 'stations-cluster-count'
 const PIN_LAYER = 'stations-pins'
 const PIN_LABEL_LAYER = 'stations-pin-labels'
+/**
+ * Explicit fontstack. MapLibre's implicit default is not guaranteed to exist on
+ * every glyph server, and a missing font makes the price silently disappear from
+ * the pin — exactly the information the pin exists to carry (spec 18.2).
+ */
+const LABEL_FONT = ['Open Sans Bold', 'Noto Sans Regular']
+
 const ROUTE_SOURCE = 'trip-route'
 const ROUTE_LAYER = 'trip-route-line'
 
@@ -54,6 +61,36 @@ export default function MapView({
   const { resolvedTheme } = useTheme()
 
   const collection = useMemo(() => toStationFeatureCollection(stations), [stations])
+
+  /**
+   * Latest data, kept in refs so the `load` handler can apply whatever arrived
+   * while the style was still downloading. Without this, stations fetched before
+   * the map finished loading would never reach the source.
+   */
+  const collectionRef = useRef(collection)
+  collectionRef.current = collection
+  const routeRef = useRef(routeGeometry)
+  routeRef.current = routeGeometry
+
+  const setSourceData = useCallback(
+    (map: MapLibreMap, sourceId: string, data: GeoJSON.GeoJSON) => {
+      const source = map.getSource(sourceId)
+      if (source && 'setData' in source) (source as maplibregl.GeoJSONSource).setData(data)
+    },
+    [],
+  )
+
+  const routeFeature = useCallback((points: readonly LatLng[]): GeoJSON.GeoJSON => {
+    if (points.length < 2) return EMPTY_COLLECTION
+    return {
+      type: 'Feature',
+      properties: {},
+      geometry: {
+        type: 'LineString',
+        coordinates: points.map((point) => [point.longitude, point.latitude]),
+      },
+    }
+  }, [])
 
   const addLayers = useCallback((map: MapLibreMap) => {
     if (map.getSource(SOURCE_ID)) return
@@ -101,6 +138,7 @@ export default function MapView({
       filter: ['has', 'point_count'],
       layout: {
         'text-field': ['get', 'point_count_abbreviated'],
+        'text-font': LABEL_FONT,
         'text-size': 13,
         'text-allow-overlap': true,
       },
@@ -150,6 +188,7 @@ export default function MapView({
       filter: ['!', ['has', 'point_count']],
       layout: {
         'text-field': ['get', 'label'],
+        'text-font': LABEL_FONT,
         'text-size': 11,
         'text-allow-overlap': true,
         'text-ignore-placement': true,
@@ -161,6 +200,13 @@ export default function MapView({
           '#ffffff',
           '#14181f',
         ],
+        'text-halo-color': [
+          'case',
+          ['boolean', ['feature-state', 'selected'], false],
+          '#0b6d4d',
+          '#ffffff',
+        ],
+        'text-halo-width': 1,
       },
     })
   }, [])
@@ -184,9 +230,17 @@ export default function MapView({
     )
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right')
 
+    // A failed style or tile request must never fail silently.
+    map.on('error', (event) => {
+      console.warn('[kiwiture:map]', (event as { error?: Error }).error ?? event)
+    })
+
     map.on('load', () => {
       readyRef.current = true
       addLayers(map)
+      // Data may already have arrived while the style was downloading.
+      setSourceData(map, SOURCE_ID, collectionRef.current)
+      setSourceData(map, ROUTE_SOURCE, routeFeature(routeRef.current?.points ?? []))
       map.getCanvas().setAttribute('aria-label', 'Carte des bornes de recharge')
       map.getCanvas().setAttribute('role', 'application')
     })
@@ -234,7 +288,7 @@ export default function MapView({
     }
     // The map is intentionally created once; theme changes are handled below.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [addLayers, onSelectStation])
+  }, [addLayers, onSelectStation, setSourceData, routeFeature])
 
   // Theme switch: swap the basemap style and re-add our layers.
   useEffect(() => {
@@ -243,24 +297,17 @@ export default function MapView({
     map.setStyle(getMapStyleUrl(resolvedTheme))
     map.once('styledata', () => {
       addLayers(map)
-      const source = map.getSource(SOURCE_ID)
-      if (source && 'setData' in source) {
-        ;(source as maplibregl.GeoJSONSource).setData(collection)
-      }
+      setSourceData(map, SOURCE_ID, collectionRef.current)
+      setSourceData(map, ROUTE_SOURCE, routeFeature(routeRef.current?.points ?? []))
     })
-    // `collection` is read only to restore data after the style swap.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resolvedTheme, addLayers])
+  }, [resolvedTheme, addLayers, setSourceData, routeFeature])
 
   // Station data.
   useEffect(() => {
     const map = mapRef.current
     if (!map || !readyRef.current) return
-    const source = map.getSource(SOURCE_ID)
-    if (source && 'setData' in source) {
-      ;(source as maplibregl.GeoJSONSource).setData(collection)
-    }
-  }, [collection])
+    setSourceData(map, SOURCE_ID, collection)
+  }, [collection, setSourceData])
 
   // Selected pin highlight via feature-state.
   useEffect(() => {
@@ -311,23 +358,8 @@ export default function MapView({
   useEffect(() => {
     const map = mapRef.current
     if (!map || !readyRef.current) return
-    const source = map.getSource(ROUTE_SOURCE)
-    if (!source || !('setData' in source)) return
-
-    const points = routeGeometry?.points ?? []
-    ;(source as maplibregl.GeoJSONSource).setData(
-      points.length > 1
-        ? {
-            type: 'Feature',
-            properties: {},
-            geometry: {
-              type: 'LineString',
-              coordinates: points.map((point) => [point.longitude, point.latitude]),
-            },
-          }
-        : EMPTY_COLLECTION,
-    )
-  }, [routeGeometry])
+    setSourceData(map, ROUTE_SOURCE, routeFeature(routeGeometry?.points ?? []))
+  }, [routeGeometry, setSourceData, routeFeature])
 
   // Fit the viewport to what we are showing.
   useEffect(() => {
