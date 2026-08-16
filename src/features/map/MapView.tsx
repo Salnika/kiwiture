@@ -36,6 +36,8 @@ export interface MapViewProps {
   origin: LatLng | null
   destination: LatLng | null
   selectedStationId: string | null
+  /** Station hovered in the list; highlighted on the map (spec 19.1). */
+  hoveredStationId?: string | null
   onSelectStation: (id: string | null) => void
   /** Encoded route polyline drawn under the pins, when a trip is active. */
   routeGeometry?: { points: LatLng[] } | null
@@ -49,6 +51,7 @@ export default function MapView({
   origin,
   destination,
   selectedStationId,
+  hoveredStationId = null,
   onSelectStation,
   routeGeometry,
   className,
@@ -156,6 +159,8 @@ export default function MapView({
           'case',
           ['boolean', ['feature-state', 'selected'], false],
           22,
+          ['boolean', ['feature-state', 'hovered'], false],
+          20,
           ['boolean', ['get', 'hasPrice'], false],
           17,
           14,
@@ -176,6 +181,8 @@ export default function MapView({
           'case',
           ['boolean', ['feature-state', 'selected'], false],
           3,
+          ['boolean', ['feature-state', 'hovered'], false],
+          2.5,
           1.5,
         ],
       },
@@ -317,7 +324,10 @@ export default function MapView({
     for (const station of stations) {
       map.setFeatureState(
         { source: SOURCE_ID, id: station.id },
-        { selected: station.id === selectedStationId },
+        {
+          selected: station.id === selectedStationId,
+          hovered: station.id === hoveredStationId,
+        },
       )
     }
 
@@ -328,7 +338,7 @@ export default function MapView({
       center: [selected.location.longitude, selected.location.latitude],
       duration: 400,
     })
-  }, [selectedStationId, stations])
+  }, [selectedStationId, hoveredStationId, stations])
 
   // Origin / destination markers.
   useEffect(() => {

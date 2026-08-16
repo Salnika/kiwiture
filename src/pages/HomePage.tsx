@@ -32,6 +32,7 @@ export default function HomePage() {
   const selectedStationId = useSearchStore((state) => state.selectedStationId)
   const selectStation = useSearchStore((state) => state.selectStation)
   const hoverStation = useSearchStore((state) => state.hoverStation)
+  const hoveredStationId = useSearchStore((state) => state.hoveredStationId)
 
   const [originText, setOriginText] = useState('')
   const [destinationText, setDestinationText] = useState('')
@@ -254,6 +255,7 @@ export default function HomePage() {
                 origin={origin}
                 destination={mode === 'trip' ? destination : null}
                 selectedStationId={selectedStationId}
+                hoveredStationId={hoveredStationId}
                 onSelectStation={selectStation}
                 routeGeometry={routePoints}
               />
