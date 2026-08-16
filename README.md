@@ -218,15 +218,19 @@ Le cache local se vide depuis **Réglages → Données locales**.
 ## Tests
 
 ```bash
-npm test        # 115 tests unitaires
-npm run test:e2e  # 9 scénarios × 2 profils (mobile + desktop)
+npm test          # 115 tests unitaires
+npm run test:e2e  # 15 tests end-to-end × 2 profils (mobile + desktop)
 ```
 
 Les tests unitaires couvrent le parsing des tarifs (y compris des formats réellement présents dans
 la base nationale), la géométrie, le calcul de coût, le regroupement des stations, les filtres, le
-scoring et la couche réseau. Les scénarios E2E couvrent la géolocalisation, le repli sur la
-recherche d'adresse, les filtres, l'estimation de coût, la panne de routing, le mode hors ligne et
-l'absence de secret dans le bundle — toutes les APIs externes étant simulées.
+scoring et la couche réseau.
+
+Les scénarios E2E couvrent la géolocalisation, le repli sur la recherche d'adresse, les filtres,
+l'estimation de coût, la panne de routing, le mode hors ligne et l'absence de secret dans le
+bundle — toutes les APIs externes étant simulées. Une suite `axe-core` vérifie en plus la
+conformité WCAG 2.1 AA de l'écran principal, des filtres, de la fiche station, des pages statiques
+et du thème sombre.
 
 Un test de contrat optionnel interroge les vraies APIs :
 
