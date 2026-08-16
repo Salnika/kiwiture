@@ -171,18 +171,38 @@ async function enrichWithDetour(input: {
     }
   })
 
-  // Road distance origin → station is still useful next to the detour.
-  await mapWithConcurrency(shortlist, ROUTING_CONCURRENCY, async (station) => {
-    const existing = byStationId.get(station.id)
-    if (!existing) return
+  // The origin → station leg is still useful next to the detour. One matrix
+  // call covers the whole shortlist; without that endpoint we simply skip it
+  // rather than doubling the number of routing requests (spec 16).
+  const provider = getRoutingProvider()
+  const routed = shortlist.filter((station) => byStationId.has(station.id))
+
+  if (provider.getMatrix && provider.matrixLimit && routed.length > 0) {
     try {
-      const route = await getCachedRoute(origin, station.location, { signal })
-      existing.routeDistanceKm = route.distanceKm
-      existing.routeDurationMin = route.durationMin
+      const batchSize = provider.matrixLimit
+      for (let start = 0; start < routed.length; start += batchSize) {
+        const batch = routed.slice(start, start + batchSize)
+        const entries = await provider.getMatrix({
+          origin,
+          destinations: batch.map((station) => station.location),
+          signal,
+        })
+        batch.forEach((station, index) => {
+          const entry = entries[index]
+          const existing = byStationId.get(station.id)
+          if (!entry || !existing) return
+          existing.routeDistanceKm = entry.distanceKm
+          existing.routeDurationMin = entry.durationMin
+          void writeRouteCache(routeCacheKey(provider.id, origin, station.location), {
+            distanceKm: entry.distanceKm,
+            durationMin: entry.durationMin,
+          })
+        })
+      }
     } catch {
       // The detour alone is enough to rank the station.
     }
-  })
+  }
 
   return {
     byStationId,
