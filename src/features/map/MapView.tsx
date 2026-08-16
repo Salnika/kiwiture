@@ -297,6 +297,22 @@ export default function MapView({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [addLayers, onSelectStation, setSourceData, routeFeature])
 
+  /*
+   * The map container grows and shrinks with the header (revealing the
+   * destination field, rotating the phone). MapLibre caches its canvas size, so
+   * it has to be told, otherwise the map renders into a stale viewport.
+   */
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container || typeof ResizeObserver === 'undefined') return
+
+    const observer = new ResizeObserver(() => {
+      mapRef.current?.resize()
+    })
+    observer.observe(container)
+    return () => observer.disconnect()
+  }, [])
+
   // Theme switch: swap the basemap style and re-add our layers.
   useEffect(() => {
     const map = mapRef.current

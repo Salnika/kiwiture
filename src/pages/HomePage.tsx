@@ -6,19 +6,27 @@ import { PlaceSearchInput } from '@/features/geocoding/PlaceSearchInput'
 import { reverseGeocode } from '@/features/geocoding'
 import { useGeolocation } from '@/features/geolocation/use-geolocation'
 import { FilterBar } from '@/features/stations/filters/FilterBar'
+import { ListPanelHeader } from '@/features/stations/ListPanelHeader'
 import { StationList } from '@/features/stations/station-list/StationList'
 import { TradeoffCallout } from '@/features/stations/TradeoffCallout'
-import { EnergyInput } from '@/features/pricing/EnergyInput'
 import { useSearchStore } from '@/features/stations/search-store'
-import { useBaseRoute, useRequestedEnergy, useStationSearch } from '@/features/stations/use-station-search'
+import {
+  useBaseRoute,
+  useRequestedEnergy,
+  useStationSearch,
+} from '@/features/stations/use-station-search'
 import { decodePolyline } from '@/lib/geo/polyline'
 import { DESKTOP_QUERY, useMediaQuery } from '@/lib/hooks/use-media-query'
-import { formatDate, formatDistanceKm } from '@/lib/format'
+import { formatDate, formatDistanceKm, pluralize } from '@/lib/format'
 import { FEATURE_FLAGS } from '@/config/env'
 
 const MapView = lazy(() => import('@/features/map/MapView'))
 
-/** Main screen (spec 20). Map + list, always in sync. */
+/**
+ * Main screen (spec 20), designed phone-first: a compact header, then the map,
+ * then the results sheet. The destination field and the detailed filters stay
+ * out of the way until they are asked for, so the map keeps the screen.
+ */
 export default function HomePage() {
   const navigate = useNavigate()
   const geolocation = useGeolocation()
@@ -36,8 +44,9 @@ export default function HomePage() {
 
   const [originText, setOriginText] = useState('')
   const [destinationText, setDestinationText] = useState('')
-  const [sheetState, setSheetState] = useState<SheetState>('half')
+  const [sheetState, setSheetState] = useState<SheetState>('collapsed')
   const [locationAsked, setLocationAsked] = useState(false)
+  const [tripOpen, setTripOpen] = useState(false)
 
   const isDesktop = useMediaQuery(DESKTOP_QUERY)
   const requestedKwh = useRequestedEnergy()
@@ -104,6 +113,17 @@ export default function HomePage() {
     [navigate, selectStation, search.stations],
   )
 
+  /** Selecting a pin should reveal the matching card, not hide it. */
+  const selectFromMap = useCallback(
+    (id: string | null) => {
+      selectStation(id)
+      if (id && !isDesktop) setSheetState((state) => (state === 'collapsed' ? 'half' : state))
+    },
+    [selectStation, isDesktop],
+  )
+
+  const showTripField = FEATURE_FLAGS.tripSearch && (tripOpen || destination !== null)
+
   const listProps = {
     stations: search.stations,
     requestedKwh,
@@ -131,8 +151,11 @@ export default function HomePage() {
       {search.origin === 'cache' && search.stations.length > 0 ? (
         <Banner tone="info" title="Affichage des dernières données disponibles">
           <p>
-            Données locales{search.fetchedAt ? ` du ${formatDate(new Date(search.fetchedAt).toISOString())}` : ''}.
-            Elles peuvent être anciennes.
+            Données locales
+            {search.fetchedAt
+              ? ` du ${formatDate(new Date(search.fetchedAt).toISOString())}`
+              : ''}
+            . Elles peuvent être anciennes.
           </p>
         </Banner>
       ) : null}
@@ -147,7 +170,7 @@ export default function HomePage() {
         <Banner tone="info" title="Zone très dense">
           <p>
             Seules les bornes dans un rayon de {formatDistanceKm(search.effectiveRadiusKm)} sont
-            chargées. Zoomez ou déplacez la recherche pour en voir d’autres.
+            chargées. Déplacez la recherche pour en voir d’autres.
           </p>
         </Banner>
       ) : null}
@@ -157,10 +180,13 @@ export default function HomePage() {
   /** Rendered once, in the desktop column or in the mobile sheet — never both. */
   const listPanel = (
     <>
-      <div className="stack" style={{ padding: 'var(--space-3) var(--space-4) 0' }}>
-        {notices}
-        <TradeoffCallout stations={search.stations} requestedKwh={requestedKwh} />
-      </div>
+      <ListPanelHeader count={search.stations.length} loading={search.isLoading} />
+      {notices || search.stations.length > 1 ? (
+        <div className="list-panel__notices">
+          {notices}
+          <TradeoffCallout stations={search.stations} requestedKwh={requestedKwh} />
+        </div>
+      ) : null}
       <StationList {...listProps} />
     </>
   )
@@ -168,27 +194,11 @@ export default function HomePage() {
   return (
     <div className="home">
       <header className="home__header">
-        <div className="home__title-row">
-          <p className="home__brand">
-            <span className="home__brand-mark" aria-hidden="true" />
-            Kiwiture
-          </p>
-          <nav className="home__header-actions" aria-label="Navigation secondaire">
-            {FEATURE_FLAGS.vehicleProfile ? (
-              <Link className="button button--ghost" to="/vehicule">
-                Véhicule
-              </Link>
-            ) : null}
-            <Link className="button button--ghost" to="/reglages">
-              Réglages
-            </Link>
-          </nav>
-        </div>
-
-        <div className="search-fields">
+        <div className="home__search-row">
+          <span className="home__brand-mark" aria-hidden="true" />
           <PlaceSearchInput
             label="Ma position ou une adresse de départ"
-            placeholder="Ma position"
+            placeholder="Où êtes-vous ?"
             value={originText}
             onValueChange={setOriginText}
             onSelect={(place) => setOrigin(place)}
@@ -197,7 +207,7 @@ export default function HomePage() {
             leadingAction={
               <button
                 type="button"
-                className="place-search__clear"
+                className="place-search__icon-button"
                 aria-label="Utiliser ma position actuelle"
                 title="Utiliser ma position actuelle"
                 onClick={() => void locate()}
@@ -206,38 +216,59 @@ export default function HomePage() {
               </button>
             }
           />
+          <nav className="home__menu" aria-label="Navigation secondaire">
+            <Link className="home__menu-link" to="/reglages" aria-label="Réglages">
+              <span aria-hidden="true">⚙</span>
+            </Link>
+          </nav>
+        </div>
 
-          {FEATURE_FLAGS.tripSearch ? (
+        {showTripField ? (
+          <div className="home__search-row home__search-row--secondary">
+            <span className="home__row-icon" aria-hidden="true">
+              →
+            </span>
             <PlaceSearchInput
-              label="Destination (facultatif)"
-              placeholder="Destination (facultatif)"
+              label="Destination"
+              placeholder="Où allez-vous ?"
               value={destinationText}
               onValueChange={setDestinationText}
               onSelect={(place) => setDestination(place)}
               onClear={() => setDestination(null)}
               proximity={origin}
             />
-          ) : null}
-        </div>
+            <button
+              type="button"
+              className="home__menu-link"
+              aria-label="Masquer la destination"
+              onClick={() => {
+                setDestination(null)
+                setDestinationText('')
+                setTripOpen(false)
+                setMode('around')
+              }}
+            >
+              <span aria-hidden="true">✕</span>
+            </button>
+          </div>
+        ) : null}
 
-        <div className="quick-actions" role="group" aria-label="Mode de recherche">
-          <Chip active={mode === 'around'} onClick={() => setMode('around')}>
-            Autour de moi
-          </Chip>
-          {FEATURE_FLAGS.tripSearch ? (
+        <div className="home__chips">
+          {FEATURE_FLAGS.tripSearch && !showTripField ? (
+            <Chip onClick={() => setTripOpen(true)}>+ Destination</Chip>
+          ) : null}
+          {showTripField ? (
             <Chip
               active={mode === 'trip'}
               disabled={!destination}
               title={destination ? undefined : 'Renseignez une destination'}
-              onClick={() => setMode('trip')}
+              onClick={() => setMode(mode === 'trip' ? 'around' : 'trip')}
             >
               Sur mon trajet
             </Chip>
           ) : null}
-          <EnergyInput />
+          <FilterBar />
         </div>
-
-        <FilterBar />
       </header>
 
       <main className="home__body" id="main">
@@ -256,7 +287,7 @@ export default function HomePage() {
                 destination={mode === 'trip' ? destination : null}
                 selectedStationId={selectedStationId}
                 hoveredStationId={hoveredStationId}
-                onSelectStation={selectStation}
+                onSelectStation={selectFromMap}
                 routeGeometry={routePoints}
               />
             </Suspense>
@@ -277,7 +308,7 @@ export default function HomePage() {
               title={
                 search.isLoading
                   ? 'Recherche…'
-                  : `${search.stations.length} borne${search.stations.length > 1 ? 's' : ''}`
+                  : `${search.stations.length} ${pluralize(search.stations.length, 'borne')}`
               }
             >
               {listPanel}

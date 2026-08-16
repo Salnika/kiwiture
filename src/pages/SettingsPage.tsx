@@ -97,6 +97,19 @@ export default function SettingsPage() {
       </section>
 
       <section className="stack card-surface">
+        <h2>Mon véhicule</h2>
+        <p>
+          Renseigner un véhicule affine la puissance réellement utilisable et l’énergie à
+          recharger.
+        </p>
+        <p>
+          <Link className="button" to="/vehicule">
+            Gérer mes véhicules
+          </Link>
+        </p>
+      </section>
+
+      <section className="stack card-surface">
         <h2>Navigation</h2>
         <Field label="Application de navigation" hint="Utilisée en premier sur la fiche station.">
           <Segmented

@@ -7,10 +7,10 @@
   gap: var(--space-1);
   align-items: center;
   padding-right: var(--space-1);
-  padding-left: var(--space-2);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border-strong);
-  border-radius: var(--radius-md);
+  padding-left: var(--space-1);
+  background: var(--color-bg-subtle);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
 }
 
 .place-search__control:focus-within {
@@ -23,6 +23,12 @@
   min-width: 0;
   min-height: var(--tap-target);
   padding: 0 var(--space-2);
+  /*
+   * 16px exactly: iOS Safari zooms the whole page when a focused input uses a
+   * smaller font, which would break the layout on every tap.
+   */
+  font-size: 16px;
+  text-overflow: ellipsis;
   background: transparent;
   border: none;
 }
@@ -91,4 +97,30 @@
   padding: var(--space-1) var(--space-2);
   font-size: var(--font-size-xs);
   color: var(--color-danger);
+}
+
+
+/* Round icon button sitting inside the search field (locate me, clear…). */
+.place-search__icon-button {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  font-size: var(--font-size-md);
+  color: var(--color-accent-text);
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-pill);
+}
+
+.place-search__icon-button:hover {
+  background: var(--color-accent-soft);
+}
+
+/* The suggestion list must clear the header and stay above the map. */
+.place-search__listbox {
+  z-index: 40;
 }

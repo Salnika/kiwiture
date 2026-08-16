@@ -78,6 +78,27 @@ test.describe('Accessibilité', () => {
     expect(results.violations, JSON.stringify(results.violations, null, 2)).toEqual([])
   })
 
+  test('la feuille de filtres est utilisable au clavier', async ({ page }) => {
+    await mockBackends(page)
+    await useMockedPosition(page)
+    await page.goto('./')
+    await page.getByTestId('station-card').first().waitFor()
+
+    const trigger = page.getByRole('button', { name: /^Filtres/ })
+    await trigger.click()
+
+    const dialog = page.getByRole('dialog', { name: 'Filtres' })
+    await expect(dialog).toBeVisible()
+    // Focus moves into the sheet when it opens.
+    await expect(dialog.getByRole('button', { name: 'Fermer' })).toBeFocused()
+
+    // Focus stays inside: tabbing from the last control wraps to the first.
+    await page.keyboard.press('Escape')
+    await expect(dialog).toBeHidden()
+    // …and comes back to the control that opened it.
+    await expect(trigger).toBeFocused()
+  })
+
   test('la liste est navigable au clavier', async ({ page }) => {
     await mockBackends(page)
     await useMockedPosition(page)

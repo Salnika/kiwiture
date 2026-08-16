@@ -4,15 +4,7 @@
   gap: var(--space-2);
 }
 
-.filters__panel {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-  padding: var(--space-3);
-  background: var(--color-bg-subtle);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-}
+
 
 .filters__group {
   padding: 0;
@@ -48,4 +40,47 @@
 .filters__hint {
   font-size: var(--font-size-xs);
   color: var(--color-text-faint);
+}
+
+/* Horizontal strip of quick filters; the detailed set lives in a sheet. */
+.filter-row {
+  display: flex;
+  gap: var(--space-2);
+  margin: 0 calc(var(--space-4) * -1);
+  padding: 0 var(--space-4);
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.filter-row::-webkit-scrollbar {
+  display: none;
+}
+
+.filter-row > * {
+  flex: none;
+}
+
+/* Inside the header strip the row is already padded by its parent. */
+.home__chips .filter-row {
+  padding: 0;
+  margin: 0;
+  overflow: visible;
+}
+
+.filter-row__more {
+  font-weight: 600;
+}
+
+.filters__groups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+/* In the sheet there is room to wrap, so nothing is cut off. */
+.filters__wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
 }

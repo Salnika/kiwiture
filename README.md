@@ -77,6 +77,28 @@ Aucune variable `VITE_*` ne doit contenir de secret : le contenu du bundle est p
 
 ---
 
+## Interface
+
+L'écran principal est dessiné **pour le téléphone d'abord** :
+
+- un en-tête sur une ligne — position, et un bouton réglages ; la destination
+  n'apparaît que si on la demande ;
+- une seule bande de puces défilable horizontalement (filtres rapides), qui ne coûte
+  aucune hauteur ;
+- **la carte occupe le reste de l'écran** ;
+- les résultats dans une bottom sheet à trois positions, dont la position réduite
+  montre déjà le nombre de bornes, le tri et la meilleure borne ;
+- les filtres détaillés s'ouvrent dans une feuille modale (piégeage du focus,
+  fermeture par Échap ou par le fond) plutôt qu'en poussant la carte hors de l'écran.
+
+Au-delà de 900 px, la liste passe dans une colonne fixe à gauche (40 / 60) et la
+bottom sheet disparaît : la liste n'est rendue qu'une fois, jamais deux.
+
+Détails qui comptent sur mobile : champs de saisie à 16 px (en dessous, iOS zoome
+la page à chaque focus), marges respectant les encoches et la barre gestuelle
+(`env(safe-area-inset-*)`), cibles tactiles à 44 px, et la carte se redimensionne
+avec son conteneur.
+
 ## Architecture
 
 ```text
@@ -219,7 +241,7 @@ Le cache local se vide depuis **Réglages → Données locales**.
 
 ```bash
 npm test          # 115 tests unitaires
-npm run test:e2e  # 15 tests end-to-end × 2 profils (mobile + desktop)
+npm run test:e2e  # 16 tests end-to-end × 2 profils (mobile + desktop)
 ```
 
 Les tests unitaires couvrent le parsing des tarifs (y compris des formats réellement présents dans

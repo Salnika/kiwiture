@@ -92,7 +92,6 @@ export function BottomSheet({
         onKeyDown={onKeyDown}
       >
         <span className="sheet__grip" aria-hidden="true" />
-        <span className="sheet__handle-label">{title}</span>
       </button>
       <div className="sheet__content">{children}</div>
     </section>
