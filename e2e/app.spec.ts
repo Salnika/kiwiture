@@ -159,20 +159,36 @@ test.describe('Kiwiture — hors ligne', () => {
     await page.goto('./')
     await expect(page.getByTestId('station-card').first()).toBeVisible()
 
-    // The service worker must control the page before we cut the network,
-    // otherwise the reload cannot even fetch the shell.
-    await page.evaluate(async () => {
-      const registration = await navigator.serviceWorker.ready
-      if (!navigator.serviceWorker.controller) {
-        await new Promise<void>((resolve) => {
-          navigator.serviceWorker.addEventListener('controllerchange', () => resolve(), {
-            once: true,
-          })
-          registration.active?.postMessage('ping')
-          setTimeout(resolve, 3000)
-        })
-      }
-    })
+    // Going offline is only meaningful once the service worker actually holds
+    // the shell and every script the page needs. Waiting on that condition —
+    // rather than on a delay — keeps the test deterministic on slow runners.
+    await page.evaluate(() => navigator.serviceWorker.ready)
+    await page.waitForFunction(
+      async () => {
+        if (!navigator.serviceWorker.controller) return false
+
+        const names = await caches.keys()
+        const assetCacheName = names.find((name) => name.includes('assets'))
+        const shellCacheName = names.find((name) => name.includes('shell'))
+        if (!assetCacheName || !shellCacheName) return false
+
+        const shell = await caches.open(shellCacheName)
+        if (!(await shell.match(`${document.baseURI}index.html`, { ignoreVary: true }))) return false
+
+        const assets = await caches.open(assetCacheName)
+        const scripts = [...document.querySelectorAll('script[src]')].map(
+          (element) => (element as HTMLScriptElement).src,
+        )
+        if (scripts.length === 0) return false
+
+        for (const src of scripts) {
+          if (!(await assets.match(src, { ignoreVary: true }))) return false
+        }
+        return true
+      },
+      null,
+      { timeout: 30_000 },
+    )
 
     // Go offline and reload: the IndexedDB cache must carry the stations.
     await context.setOffline(true)
