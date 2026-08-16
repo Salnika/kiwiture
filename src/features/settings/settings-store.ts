@@ -44,6 +44,14 @@ function reviveVehicles(value: unknown): LocalVehicle[] | null {
   )
 }
 
+/**
+ * Reads the persisted preferences without touching the store.
+ * Lets other stores seed their initial state from the user's defaults.
+ */
+export function readUserSettings(): UserSettings {
+  return readLocal(STORAGE_KEYS.settings, DEFAULT_SETTINGS, reviveSettings)
+}
+
 interface SettingsState {
   settings: UserSettings
   vehicles: LocalVehicle[]
@@ -67,10 +75,8 @@ const createId = (): string =>
 
 export const useSettingsStore = create<SettingsState>((set, get) => ({
   settings: {
-    ...readLocal(STORAGE_KEYS.settings, DEFAULT_SETTINGS, reviveSettings),
-    preferredNavigationApp:
-      readLocal(STORAGE_KEYS.settings, DEFAULT_SETTINGS, reviveSettings).preferredNavigationApp ??
-      defaultNavigationApp(),
+    ...readUserSettings(),
+    preferredNavigationApp: readUserSettings().preferredNavigationApp ?? defaultNavigationApp(),
   },
   vehicles: readLocal(STORAGE_KEYS.vehicles, [], reviveVehicles),
   activeVehicleId: readLocal<string | null>(STORAGE_KEYS.activeVehicle, null),

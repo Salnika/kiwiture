@@ -3,7 +3,8 @@ import { DEFAULT_SEARCH_RADIUS_KM } from '@/config/constants'
 import type { LatLng } from '@/lib/geo/coordinates'
 import { readLocal, STORAGE_KEYS, writeLocal } from '@/lib/storage/local-storage'
 import type { SortMode } from '@/types/domain'
-import { DEFAULT_FILTERS, type StationFilters } from './filters/filters'
+import { readUserSettings } from '@/features/settings/settings-store'
+import { countActiveFilters, DEFAULT_FILTERS, type StationFilters } from './filters/filters'
 
 /**
  * UI / user state only (spec 40).
@@ -57,13 +58,33 @@ function reviveFilters(value: unknown): StationFilters | null {
   return { ...DEFAULT_FILTERS, ...(value as Partial<StationFilters>) }
 }
 
+function isPristine(filters: StationFilters): boolean {
+  return countActiveFilters(filters) === 0
+}
+
+/**
+ * Initial filters: the persisted ones, or — when the user never touched a
+ * filter — the defaults declared in the settings screen (spec 27).
+ */
+function initialFilters(): StationFilters {
+  const persisted = readLocal(STORAGE_KEYS.filters, DEFAULT_FILTERS, reviveFilters)
+  if (!isPristine(persisted)) return persisted
+
+  const settings = readUserSettings()
+  return {
+    ...persisted,
+    connectors: settings.defaultConnector ? [settings.defaultConnector] : persisted.connectors,
+    minPowerKw: settings.defaultMinPowerKw ?? persisted.minPowerKw,
+  }
+}
+
 export const useSearchStore = create<SearchState>((set, get) => ({
   origin: null,
   destination: null,
   mode: 'around',
   radiusKm: DEFAULT_SEARCH_RADIUS_KM,
-  filters: readLocal(STORAGE_KEYS.filters, DEFAULT_FILTERS, reviveFilters),
-  sort: 'recommended',
+  filters: initialFilters(),
+  sort: readUserSettings().defaultSort,
   selectedStationId: null,
   hoveredStationId: null,
   viewport: null,
