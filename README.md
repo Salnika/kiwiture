@@ -247,6 +247,16 @@ Le build ne produit que des fichiers statiques dans `dist/`. Aucune fonction bac
 `index.html` est généré pour que les liens profonds fonctionnent malgré l'absence de règle de
 réécriture.
 
+**Étape manuelle unique.** GitHub Pages doit être activé une fois dans les réglages du dépôt : le
+jeton d'un workflow n'a pas le droit de créer le site lui-même. Dans
+**Settings → Pages**, choisissez **Source : GitHub Actions**. Ensuite, relancez le workflow
+*Deploy to GitHub Pages* (onglet Actions → *Run workflow*) ou poussez un commit : le site est publié
+sur `https://<utilisateur>.github.io/kiwiture/`.
+
+Pour utiliser Mapbox en production, ajoutez une **variable** de dépôt (pas un secret, puisque la
+valeur est publique) nommée `VITE_MAPBOX_PUBLIC_TOKEN` dans
+**Settings → Secrets and variables → Actions → Variables**.
+
 ### Autres hébergeurs
 
 Netlify, Vercel, Cloudflare Pages ou S3 + CDN servent depuis la racine du domaine :
