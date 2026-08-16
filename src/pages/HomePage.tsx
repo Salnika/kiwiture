@@ -48,9 +48,14 @@ export default function HomePage() {
     return { points: decodePolyline(baseRoute.data.geometry, baseRoute.data.geometryPrecision ?? 5) }
   }, [mode, baseRoute.data?.geometry, baseRoute.data?.geometryPrecision])
 
+  // `useGeolocation` returns a fresh object on every render, so we depend on the
+  // stable `request` callback only — otherwise the effect below would reschedule
+  // its timer on each render and the first location request could never fire.
+  const requestPosition = geolocation.request
+
   const locate = useCallback(async () => {
     setLocationAsked(true)
-    const position = await geolocation.request()
+    const position = await requestPosition()
     if (!position) return
     setOrigin({ ...position, label: 'Ma position' })
     setOriginText('Ma position')
@@ -61,7 +66,7 @@ export default function HomePage() {
     } catch {
       /* keep "Ma position" */
     }
-  }, [geolocation, setOrigin])
+  }, [requestPosition, setOrigin])
 
   /**
    * Geolocation is requested only after the shell has painted (spec 13), and
