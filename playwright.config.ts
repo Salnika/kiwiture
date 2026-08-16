@@ -51,7 +51,10 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: `npx vite preview --port ${PORT} --strictPort`,
+    // `--host 127.0.0.1` is required: without it Vite binds `localhost`, which on
+    // some CI runners resolves to ::1 only, and Playwright's IPv4 health check
+    // never succeeds.
+    command: `npx vite preview --port ${PORT} --strictPort --host 127.0.0.1`,
     url: `http://127.0.0.1:${PORT}${BASE_PATH}`,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
